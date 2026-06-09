@@ -5,7 +5,7 @@
 ## Usage
 
 ```yaml
-- uses: Framework-R-D/action-run-change-detection@v1  # pin to commit SHA in production
+- uses: Framework-R-D/action-run-change-detection@c70418d77a03191b165dd7dfebadbe00c443566c # v1
   with:
     input-name: value
 ```
