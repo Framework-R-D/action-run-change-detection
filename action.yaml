@@ -59,7 +59,7 @@ runs:
 
     - name: Detect relevant changes
       id: filter
-      uses: Framework-R-D/phlex/.github/actions/detect-relevant-changes@main
+      uses: Framework-R-D/action-detect-relevant-changes@6ede78eec7af8d0e271a2bd2bd8b08f8a7bc9cba # v1
       with:
         repo-path: ${{ inputs.checkout-path }}
         base-ref: ${{ inputs.base-ref }}
