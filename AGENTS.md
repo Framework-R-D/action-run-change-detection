@@ -14,14 +14,14 @@ extracted for standalone reuse.
 
 | Name | Description | Required | Default |
 | ---- | ----------- | -------- | ------- |
-| `checkout-path` | Path to check out code to | True |  |
-| `ref` | The branch, ref, or SHA to checkout | True |  |
-| `repo` | The repository to checkout from | True |  |
-| `base-ref` | The base ref for comparison | True |  |
-| `file-type` | Predefined file type (cpp, python, cmake, jsonnet, yaml, md) | False |  |
-| `include-globs` | Custom include globs | False |  |
-| `exclude-globs` | Custom exclude globs | False |  |
-| `head-ref` | Explicit head ref (defaults to inputs.ref) | False |  |
+| `checkout-path` | Path to check out code to | True | |
+| `ref` | The branch, ref, or SHA to checkout | True | |
+| `repo` | The repository to checkout from | True | |
+| `base-ref` | The base ref for comparison | True | |
+| `file-type` | Predefined file type (cpp, python, cmake, jsonnet, yaml, md) | False | |
+| `include-globs` | Custom include globs | False | |
+| `exclude-globs` | Custom exclude globs | False | |
+| `head-ref` | Explicit head ref (defaults to inputs.ref) | False | |
 
 **Outputs:**
 
