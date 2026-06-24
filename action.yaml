@@ -43,8 +43,8 @@ runs:
     # pull_request_target, the empty sparse checkout below ensures no
     # files from the ref are materialized on disk — only git objects are
     # fetched — so no code from the PR is ever executed.
+    # codeql[actions/untrusted-checkout/medium]
     - name: Check out source code
-      # codeql[actions/untrusted-checkout/medium]
       uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6.0.3
       with:
         fetch-depth: 0
