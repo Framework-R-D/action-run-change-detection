@@ -5,7 +5,7 @@
 ## Usage
 
 ```yaml
-- uses: Framework-R-D/action-run-change-detection@c70418d77a03191b165dd7dfebadbe00c443566c # v1
+- uses: Framework-R-D/action-run-change-detection@047250bcbe1be9fb479c8f3ceeb85ac1084ede2e # v2
   with:
     input-name: value
 ```
