@@ -23,6 +23,10 @@ jobs:
           ACTOR: ${{ github.actor }}
         run: |
           set -euo pipefail
+          if [ "$ACTOR" = "dependabot[bot]" ] && [ -z "$SLACK_URL" ]; then
+            echo "Skipping Dependabot push alert because its Slack webhook is unavailable."
+            exit 0
+          fi
           : "${SLACK_URL:?SLACK_WEBHOOK_URL is not configured}"
 
           # Rebase merges can name the merging user as committer. Check the PR record instead.

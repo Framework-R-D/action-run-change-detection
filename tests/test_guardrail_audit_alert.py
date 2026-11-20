@@ -146,12 +146,20 @@ class GuardrailAlertTests(unittest.TestCase):
                 self.assertEqual(curl is not None, alerts)
 
     def test_forced_push_alerts_without_lookup(self) -> None:
-        """A force push never earns a PR exemption, including bot pushes."""
+        """A force push never earns a PR exemption when Slack is configured."""
         result, curl, gh = self.run_script(
             FORCED_PUSH="true", GH_EXIT="1", ACTOR="dependabot[bot]", PUSHED_AT=""
         )
         self.assertEqual(result.returncode, 0, result.stderr)
         self.assertIsNotNone(curl)
+        self.assertIsNone(gh)
+
+    def test_dependabot_without_webhook_skips_before_configuration_error(self) -> None:
+        """Dependabot cannot access Actions secrets unless its webhook is configured."""
+        result, curl, gh = self.run_script(ACTOR="dependabot[bot]", SLACK_URL="")
+        self.assertEqual(result.returncode, 0, result.stderr)
+        self.assertIn("Skipping Dependabot push alert", result.stdout)
+        self.assertIsNone(curl)
         self.assertIsNone(gh)
 
     def test_missing_or_invalid_event_time_alerts(self) -> None:
