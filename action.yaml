@@ -65,14 +65,20 @@ runs:
         value = os.environ['INPUT_PATH']
         path = Path(value)
         root = Path(os.environ['GITHUB_WORKSPACE']).resolve()
-        if not value or path.is_absolute() or any(part in ['', '.', '..'] for part in value.split('/')) or any(ord(c) < 32 for c in value):
+        if (
+            not value
+            or value != value.strip()
+            or path.is_absolute()
+            or any(part in ['', '.', '..'] for part in value.split('/'))
+            or any(ord(c) < 32 for c in value)
+        ):
             raise SystemExit('Invalid checkout path')
         if not (root / path).resolve().is_relative_to(root):
             raise SystemExit('Checkout path escapes workspace')
         version = subprocess.run(['git', '--version'], check=True, capture_output=True, text=True).stdout
         match = re.search(r'(\d+)\.(\d+)', version)
-        if not match or tuple(map(int, match.groups())) < (2, 25):
-            raise SystemExit('Git 2.25 or newer is required for sparse checkout')
+        if not match or tuple(map(int, match.groups())) < (2, 28):
+            raise SystemExit('Git 2.28 or newer is required for sparse checkout')
         with open(os.environ['GITHUB_OUTPUT'], 'a', encoding='utf-8') as output:
             output.write(f'sha={sha}\n')
         PY
@@ -92,12 +98,40 @@ runs:
         sparse-checkout-cone-mode: false
         sparse-checkout: "!/*"
 
+    - name: Resolve base comparison ref
+      id: base
+      shell: bash
+      working-directory: ${{ inputs.checkout-path }}
+      env:
+        INPUT_BASE_REF: ${{ inputs.base-ref }}
+      run: |
+        set -euo pipefail
+        case "$INPUT_BASE_REF" in
+          refs/heads/*)
+            candidate="refs/remotes/origin/${INPUT_BASE_REF#refs/heads/}"
+            ;;
+          refs/remotes/*|refs/tags/*)
+            candidate="$INPUT_BASE_REF"
+            ;;
+          *)
+            if [[ "$INPUT_BASE_REF" =~ ^[0-9a-f]{40}$ ]]; then
+              candidate="$INPUT_BASE_REF"
+            elif git show-ref --verify --quiet "refs/remotes/origin/$INPUT_BASE_REF"; then
+              candidate="refs/remotes/origin/$INPUT_BASE_REF"
+            else
+              candidate="$INPUT_BASE_REF"
+            fi
+            ;;
+        esac
+        base_sha="$(git rev-parse --verify --end-of-options "${candidate}^{commit}")"
+        printf 'base-ref=%s\n' "$base_sha" >> "$GITHUB_OUTPUT"
+
     - name: Detect relevant changes
       id: filter
       uses: Framework-R-D/action-detect-relevant-changes@6ede78eec7af8d0e271a2bd2bd8b08f8a7bc9cba # v1
       with:
         repo-path: ${{ inputs.checkout-path }}
-        base-ref: ${{ inputs.base-ref }}
+        base-ref: ${{ steps.base.outputs.base-ref }}
         head-ref: ${{ steps.target.outputs.sha }}
         file-type: ${{ inputs.file-type }}
         include-globs: ${{ inputs.include-globs }}
